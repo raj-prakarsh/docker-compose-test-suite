@@ -1,0 +1,32 @@
+{
+  "name": "tamarack",
+  "version": "0.1.0",
+  "description": "Default paths and error pages for uri:s.",
+  "main": "app.js",
+  "private": false,
+  "license": "MIT License",
+  "dependencies": {
+    "applicationinsights": "^1.5.0",
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "express-session": "^1.17.0",
+    "kth-node-api-call": "^3.0.4",
+    "kth-node-log": "^3.0.2",
+    "request": "^2.88.0"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^6.2.2",
+    "nodemon": "^1.19.4"
+  },
+  "scripts": {
+    "start": "node app.js",
+    "start-dev": "LOG_LEVEL=debug PORTILLO_CLUSTER=active APPLICATIONS_API_HOST=api.kth.se APPLICATIONS_API_KEY=x DOMAIN_OWNERSHIP_VERIFICATION_FILE=verified.txt DOMAIN_OWNERSHIP_VERIFICATION_FILE_CONTENT=verified PORT=3000 nodemon app.js",
+    "test": "NODE_ENV=development node_modules/mocha/bin/mocha ./tests/unit-tests/test-*.js",
+    "test-integration-in-docker": "ID=$(docker build -q .) && LOCAL_IMAGE_ID=$ID docker-compose -f docker-compose-integration-tests.yml up --abort-on-container-exit --always-recreate-deps",
+    "test-unit-in-docker": "ID=$(docker build -q .) && LOCAL_IMAGE_ID=$ID docker-compose -f docker-compose-unit-tests.yml up --abort-on-container-exit --always-recreate-deps"
+  },
+  "engines": {
+    "node": "^10.14.0"
+  }
+}

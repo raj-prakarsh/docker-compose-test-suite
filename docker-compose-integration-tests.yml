@@ -1,0 +1,36 @@
+version: '3'
+
+#
+# Run this integration test by running:
+# ID=$(docker build -q .) && LOCAL_IMAGE_ID=$ID docker-compose -f docker-compose-integration-tests.yml up --abort-on-container-exit --always-recreate-deps
+#
+services:
+
+  #############################################
+  # Start http://web:3000/
+  #############################################
+  web:
+    # build from local Dockerfile
+    build: .
+    # if not --build and kth-azure-app already exists in
+    # your local computers registry 'image' is used.
+    image: $LOCAL_IMAGE_ID
+    
+    # Possible configuration for the app.
+    environment:
+      PORTILLO_CLUSTER: "development" # Will show under /_monitor
+      APPINSIGHTS_INSTRUMENTATIONKEY: ""
+
+
+    ports:
+      - 80
+  #############################################
+  # Start the client running tests 
+  # agains http://web:3000/
+  #############################################
+  integration-tests:
+    # Build client image and run tests
+    # from inside that.
+    build: ./tests/integration-tests
+    depends_on:
+      - web

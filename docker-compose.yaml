@@ -1,0 +1,67 @@
+version: "3"
+services:
+  test_auth.dt.com:
+    image: aonauth:latest
+    container_name: test_auth
+    depends_on:
+            - aon_test_aerospike
+            - aon_test_db
+            - aon_test_redis
+    environment:
+            - PYTHONUNBUFFERED=0
+            - APP_TYPE=test
+            - CURR_ENV=test
+    sysctls:
+       net.core.somaxconn: 4096
+    volumes:
+      - ./:/usr/local/dt/aon
+      - /logs/aon:/logs
+    ports:
+     - 8088:80
+     - 4444:4444
+    stdin_open: true
+    tty: true
+    command: >
+       bash -c "
+         /bin/touch /logs/auth.log && chown -R 0777 /logs && /usr/bin/supervisord -n
+       "
+  aon_test_db:
+     image: mysql:5.6.39
+     restart: always
+     container_name: aon_test_db
+     expose:
+          - 3306
+     ports:
+          - '13306:3306'
+     volumes:
+      - ./dockerconfig/data:/docker-entrypoint-initdb.d/
+     environment:
+        MYSQL_DATABASE: "test_dt"
+        MYSQL_USER: "pro"
+        MYSQL_PASSWORD: "******"
+        MYSQL_ROOT_PASSWORD: "*******"
+        MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+  aon_test_redis:
+   image: redis:latest
+   restart: always
+   container_name: aon_test_redis
+   expose:
+        - 6379
+   ports:
+      - '16379:6379'
+   command: redis-server /usr/local/etc/redis/redis.conf
+   sysctls:
+      net.core.somaxconn: 4096
+   volumes:
+     - ./test_redis.conf:/usr/local/etc/redis/redis.conf
+
+  aon_test_aerospike:
+    image: aerospike
+    restart: always
+    container_name: aon_test_aerospike
+    expose:
+      - 3000
+    ports:
+      - '13000:3000'
+    environment:
+      NAMESPACE: "sessions"
